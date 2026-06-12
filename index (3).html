@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teachers Fund — نئے کسٹمر کی رجسٹریشن</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Nastaliq Urdu',serif;background:#f0fdf4;min-height:100vh;direction:rtl}
+.header{background:linear-gradient(135deg,#064e3b,#15803d);color:white;text-align:center;padding:28px 20px 24px}
+.header h1{font-size:22px;font-weight:700;margin-bottom:6px}
+.header p{font-size:13px;opacity:.85}
+.form-wrap{max-width:520px;margin:0 auto;padding:20px 16px 40px}
+.card{background:white;border-radius:14px;padding:22px 20px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.07)}
+.card-title{font-size:15px;font-weight:700;color:#14532d;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #dcfce7}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:13px;color:#374151;margin-bottom:6px;font-weight:600}
+.fg input,.fg textarea{width:100%;padding:12px 14px;border:1.5px solid #d1fae5;border-radius:10px;font-family:'Noto Nastaliq Urdu',serif;font-size:14px;outline:none;transition:border .2s;background:white}
+.fg input:focus,.fg textarea:focus{border-color:#15803d;box-shadow:0 0 0 3px rgba(21,128,61,.1)}
+.fg textarea{resize:vertical;min-height:80px}
+.fg .err{font-size:11px;color:#dc2626;margin-top:4px;display:none}
+.selfie-area{border:2px dashed #86efac;border-radius:12px;padding:20px;text-align:center;cursor:pointer;background:#f0fdf4;position:relative}
+.selfie-area .ico{font-size:40px;margin-bottom:8px}
+.selfie-area p{font-size:13px;color:#15803d;font-weight:600}
+#selfie-preview{width:100%;max-width:240px;border-radius:12px;margin-top:12px;display:none;border:3px solid #15803d}
+#selfie-input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.submit-btn{width:100%;padding:16px;background:linear-gradient(135deg,#064e3b,#15803d);color:white;border:none;border-radius:12px;font-family:'Noto Nastaliq Urdu',serif;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px}
+.submit-btn:disabled{opacity:.6;cursor:not-allowed}
+.success-screen{display:none;text-align:center;padding:40px 20px;background:white;border-radius:16px;margin:20px}
+.required{color:#dc2626}
+#fb-status{text-align:center;padding:8px;font-size:12px;color:#6b7280;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="font-size:36px;margin-bottom:8px">🏫</div>
+  <h1>Teachers Fund Management</h1>
+  <p>نئے کسٹمر کی رجسٹریشن فارم</p>
+</div>
+
+<div class="form-wrap">
+  <div id="fb-status">🔄 Firebase لوڈ ہو رہا ہے...</div>
+
+  <div class="success-screen" id="success-screen">
+    <div style="font-size:64px;margin-bottom:16px">✅</div>
+    <h2 style="color:#14532d;font-size:20px;margin-bottom:8px">درخواست موصول ہو گئی!</h2>
+    <p style="color:#6b7280;font-size:13px">آپ کی معلومات ہمیں مل گئی ہیں۔ جلد رابطہ کیا جائے گا۔</p>
+  </div>
+
+  <form id="main-form">
+    <div class="card">
+      <div class="card-title">👤 ذاتی معلومات</div>
+      <div class="fg">
+        <label>مکمل نام <span class="required">*</span></label>
+        <input type="text" id="f-name" placeholder="مثلاً: محمد احمد خان">
+        <div class="err" id="err-name">نام درج کریں</div>
+      </div>
+      <div class="fg">
+        <label>WhatsApp / فون نمبر <span class="required">*</span></label>
+        <input type="tel" id="f-phone" placeholder="03XXXXXXXXX" style="direction:ltr;text-align:right">
+        <div class="err" id="err-phone">درست نمبر درج کریں (03XXXXXXXXX)</div>
+      </div>
+      <div class="fg">
+        <label>CNIC نمبر <span class="required">*</span></label>
+        <input type="text" id="f-cnic" placeholder="XXXXX-XXXXXXX-X" maxlength="15" style="direction:ltr;text-align:right">
+        <div class="err" id="err-cnic">درست CNIC درج کریں</div>
+      </div>
+      <div class="fg">
+        <label>مکمل پتہ <span class="required">*</span></label>
+        <textarea id="f-address" placeholder="گھر نمبر، گلی، محلہ، شہر"></textarea>
+        <div class="err" id="err-address">پتہ درج کریں</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🛒 پروڈکٹ اور اقساط کا انتخاب</div>
+
+      <!-- پروڈکٹ -->
+      <div class="fg">
+        <label>پروڈکٹ منتخب کریں <span class="required">*</span></label>
+        <select id="f-product" onchange="onProductChange()" style="width:100%;padding:12px 14px;border:1.5px solid #d1fae5;border-radius:10px;font-family:'Noto Nastaliq Urdu',serif;font-size:14px;outline:none;background:white">
+          <option value="">— پروڈکٹ چنیں —</option>
+          <option value="موبائل فون">📱 موبائل فون</option>
+          <option value="لیپ ٹاپ">💻 لیپ ٹاپ</option>
+          <option value="ٹیبلٹ">📟 ٹیبلٹ</option>
+          <option value="TV / LCD">📺 TV / LCD</option>
+          <option value="فریج">🧊 فریج</option>
+          <option value="واشنگ مشین">🫧 واشنگ مشین</option>
+          <option value="AC">❄️ AC</option>
+          <option value="موٹر سائیکل">🏍️ موٹر سائیکل</option>
+          <option value="دیگر">🔧 دیگر</option>
+        </select>
+        <div class="err" id="err-product">پروڈکٹ منتخب کریں</div>
+      </div>
+
+      <!-- اگر دیگر ہو تو نام لکھیں -->
+      <div class="fg" id="product-other-wrap" style="display:none">
+        <label>پروڈکٹ کا نام لکھیں <span class="required">*</span></label>
+        <input type="text" id="f-product-other" placeholder="مثلاً: سولر پینل">
+      </div>
+
+      <!-- قیمت -->
+      <div class="fg" id="price-wrap" style="display:none">
+        <label>پروڈکٹ کی تخمینی قیمت (₨) <span class="required">*</span></label>
+        <input type="number" id="f-price" placeholder="مثلاً: 50000" min="1000" oninput="calcInstallments()" style="direction:ltr;text-align:right">
+        <div class="err" id="err-price">درست قیمت درج کریں</div>
+      </div>
+
+      <!-- اقساط کا دورانیہ -->
+      <div id="plan-wrap" style="display:none">
+        <label style="display:block;font-size:13px;color:#374151;margin-bottom:10px;font-weight:600">اقساط کا دورانیہ منتخب کریں <span class="required">*</span></label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+          <div onclick="selectPlan(12,30)" id="plan-12" class="plan-card" style="border:2px solid #d1fae5;border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all .2s">
+            <div style="font-size:18px;font-weight:700;color:#14532d">12 ماہ</div>
+            <div style="font-size:12px;color:#6b7280">30% منافع</div>
+            <div id="monthly-12" style="font-size:13px;color:#15803d;font-weight:600;margin-top:4px"></div>
+          </div>
+          <div onclick="selectPlan(9,25)" id="plan-9" class="plan-card" style="border:2px solid #d1fae5;border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all .2s">
+            <div style="font-size:18px;font-weight:700;color:#14532d">9 ماہ</div>
+            <div style="font-size:12px;color:#6b7280">25% منافع</div>
+            <div id="monthly-9" style="font-size:13px;color:#15803d;font-weight:600;margin-top:4px"></div>
+          </div>
+          <div onclick="selectPlan(6,20)" id="plan-6" class="plan-card" style="border:2px solid #d1fae5;border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all .2s">
+            <div style="font-size:18px;font-weight:700;color:#14532d">6 ماہ</div>
+            <div style="font-size:12px;color:#6b7280">20% منافع</div>
+            <div id="monthly-6" style="font-size:13px;color:#15803d;font-weight:600;margin-top:4px"></div>
+          </div>
+          <div onclick="selectPlan(3,15)" id="plan-3" class="plan-card" style="border:2px solid #d1fae5;border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all .2s">
+            <div style="font-size:18px;font-weight:700;color:#14532d">3 ماہ</div>
+            <div style="font-size:12px;color:#6b7280">15% منافع</div>
+            <div id="monthly-3" style="font-size:13px;color:#15803d;font-weight:600;margin-top:4px"></div>
+          </div>
+        </div>
+        <div class="err" id="err-plan">اقساط کا دورانیہ منتخب کریں</div>
+
+        <!-- منتخب پلان کا خلاصہ -->
+        <div id="plan-summary" style="display:none;background:linear-gradient(135deg,#064e3b,#15803d);color:white;border-radius:12px;padding:16px;margin-top:10px;text-align:center">
+          <div style="font-size:13px;opacity:.85;margin-bottom:8px">آپ کا منتخب پلان</div>
+          <div style="display:flex;justify-content:space-around;flex-wrap:wrap;gap:8px">
+            <div><div style="font-size:11px;opacity:.8">پروڈکٹ قیمت</div><div id="sum-cost" style="font-size:16px;font-weight:700;font-family:'Noto Sans Arabic',serif"></div></div>
+            <div><div style="font-size:11px;opacity:.8">کل قیمت</div><div id="sum-total" style="font-size:16px;font-weight:700;font-family:'Noto Sans Arabic',serif"></div></div>
+            <div><div style="font-size:11px;opacity:.8">ماہانہ قسط</div><div id="sum-monthly" style="font-size:18px;font-weight:800;font-family:'Noto Sans Arabic',serif;color:#86efac"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+      <div class="fg">
+        <label>ریفرنس کا نام <span class="required">*</span></label>
+        <input type="text" id="f-ref-name" placeholder="جس نے آپ کو بھیجا">
+        <div class="err" id="err-ref-name">ریفرنس کا نام درج کریں</div>
+      </div>
+      <div class="fg">
+        <label>ریفرنس کا WhatsApp نمبر <span class="required">*</span></label>
+        <input type="tel" id="f-ref-phone" placeholder="03XXXXXXXXX" style="direction:ltr;text-align:right">
+        <div class="err" id="err-ref-phone">ریفرنس کا نمبر درج کریں</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📷 تازہ سیلفی <span class="required">*</span></div>
+      <div class="selfie-area" id="selfie-area">
+        <input type="file" id="selfie-input" accept="image/*" capture="user" onchange="handleSelfie(this)">
+        <div class="ico">🤳</div>
+        <p>یہاں کلک کریں — کیمرہ کھل جائے گا</p>
+        <small style="color:#6b7280;font-size:12px">تازہ سیلفی لیں — پرانی تصویر قابل قبول نہیں</small>
+        <br>
+        <img id="selfie-preview" src="" alt="سیلفی">
+      </div>
+      <div class="err" id="err-selfie" style="margin-top:8px">سیلفی ضروری ہے</div>
+    </div>
+
+    <!-- شناختی کارڈ -->
+    <div class="card">
+      <div class="card-title">🪪 شناختی کارڈ کی تصاویر <span class="required">*</span></div>
+
+      <!-- آگے کی طرف -->
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:13px;color:#374151;margin-bottom:8px;font-weight:600">سامنے کی طرف (Front)</label>
+        <div class="selfie-area" id="cnic-front-area" style="border-color:#bfdbfe;background:#eff6ff">
+          <input type="file" id="cnic-front-input" accept="image/*" capture="environment" onchange="handleCnic(this,'front')">
+          <div class="ico">🪪</div>
+          <p style="color:#1e40af">آگے کی طرف کی تصویر لیں</p>
+          <small style="color:#6b7280;font-size:12px">CNIC کا سامنے والا حصہ</small>
+          <br>
+          <img id="cnic-front-preview" src="" style="width:100%;max-width:280px;border-radius:10px;margin-top:10px;display:none;border:2px solid #1e40af">
+        </div>
+        <div class="err" id="err-cnic-front" style="margin-top:6px">شناختی کارڈ کی سامنے کی تصویر ضروری ہے</div>
+      </div>
+
+      <!-- پیچھے کی طرف -->
+      <div>
+        <label style="display:block;font-size:13px;color:#374151;margin-bottom:8px;font-weight:600">پیچھے کی طرف (Back)</label>
+        <div class="selfie-area" id="cnic-back-area" style="border-color:#bfdbfe;background:#eff6ff">
+          <input type="file" id="cnic-back-input" accept="image/*" capture="environment" onchange="handleCnic(this,'back')">
+          <div class="ico">🔄</div>
+          <p style="color:#1e40af">پیچھے کی طرف کی تصویر لیں</p>
+          <small style="color:#6b7280;font-size:12px">CNIC کا پچھلا حصہ</small>
+          <br>
+          <img id="cnic-back-preview" src="" style="width:100%;max-width:280px;border-radius:10px;margin-top:10px;display:none;border:2px solid #1e40af">
+        </div>
+        <div class="err" id="err-cnic-back" style="margin-top:6px">شناختی کارڈ کی پیچھے کی تصویر ضروری ہے</div>
+      </div>
+    </div>
+
+    <!-- شرائط و ضوابط -->
+    <div class="card" style="border:2px solid #fde68a;background:#fffbeb">
+      <div class="card-title" style="color:#92400e;border-color:#fde68a">📜 اقرارنامہ — شرائط و ضوابط</div>
+      <p style="font-size:13px;color:#374151;line-height:2;margin-bottom:16px">
+        براہ کرم درج ذیل شرائط کو غور سے پڑھیں اور قبول کریں:
+      </p>
+
+      <div style="background:white;border-radius:10px;padding:16px;margin-bottom:12px;border:1px solid #fde68a">
+        <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer">
+          <input type="checkbox" id="term-1" style="width:20px;height:20px;margin-top:4px;accent-color:#15803d;flex-shrink:0">
+          <span style="font-size:13px;color:#374151;line-height:2">
+            حلفاً اقرار کرتا/کرتی ہوں کہ خریدی گئی شے کی <strong>ماہانہ قسط ہر ماہ کی 10 تاریخ سے پہلے</strong> جمع کرانے کا پابند/پابند ہوں گا/ہوں گی۔
+          </span>
+        </label>
+      </div>
+
+      <div style="background:white;border-radius:10px;padding:16px;border:1px solid #fde68a">
+        <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer">
+          <input type="checkbox" id="term-2" style="width:20px;height:20px;margin-top:4px;accent-color:#15803d;flex-shrink:0">
+          <span style="font-size:13px;color:#374151;line-height:2">
+            میں اس بات کا پابند/پابند ہوں کہ فارم پر درج شدہ <strong>کل مدت (مثلاً 6 ماہ یا 12 ماہ) کے اندر تمام اقساط مکمل طور پر ادا</strong> کر دوں گا/گی۔
+          </span>
+        </label>
+      </div>
+
+      <div class="err" id="err-terms" style="margin-top:10px;font-size:12px">دونوں شرائط قبول کرنا لازمی ہے</div>
+    </div>
+
+    <button type="button" onclick="submitForm()" class="submit-btn" id="submit-btn">
+      ✔ درخواست جمع کریں
+    </button>
+  </form>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+var selfieBase64='';
+var cnicFrontBase64='';
+var cnicBackBase64='';
+var fbReady=false;
+var selectedPlan={months:0,pct:0};
+
+function fmt(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+
+function compressImage(file,callback){
+  var img=new Image();
+  var reader=new FileReader();
+  reader.onload=function(e){
+    img.onload=function(){
+      var canvas=document.createElement('canvas');
+      var MAX=800;
+      var w=img.width,h=img.height;
+      if(w>h){if(w>MAX){h=h*(MAX/w);w=MAX;}}
+      else{if(h>MAX){w=w*(MAX/h);h=MAX;}}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      callback(canvas.toDataURL('image/jpeg',0.7));
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleSelfie(input){
+  var file=input.files[0];
+  if(!file)return;
+  compressImage(file,function(b64){
+    selfieBase64=b64;
+    var preview=document.getElementById('selfie-preview');
+    preview.src=b64;preview.style.display='block';
+    document.getElementById('selfie-area').style.borderColor='#15803d';
+    document.getElementById('err-selfie').style.display='none';
+  });
+}
+
+function handleCnic(input,side){
+  var file=input.files[0];
+  if(!file)return;
+  compressImage(file,function(b64){
+    if(side==='front'){
+      cnicFrontBase64=b64;
+      var p=document.getElementById('cnic-front-preview');
+      p.src=b64;p.style.display='block';
+      document.getElementById('cnic-front-area').style.borderColor='#1e40af';
+      document.getElementById('err-cnic-front').style.display='none';
+    } else {
+      cnicBackBase64=b64;
+      var p=document.getElementById('cnic-back-preview');
+      p.src=b64;p.style.display='block';
+      document.getElementById('cnic-back-area').style.borderColor='#1e40af';
+      document.getElementById('err-cnic-back').style.display='none';
+    }
+  });
+}
+  var v=document.getElementById('f-product').value;
+  document.getElementById('product-other-wrap').style.display=v==='دیگر'?'':'none';
+  document.getElementById('price-wrap').style.display=v?'':'none';
+  document.getElementById('plan-wrap').style.display='none';
+  document.getElementById('plan-summary').style.display='none';
+  selectedPlan={months:0,pct:0};
+  document.getElementById('err-product').style.display='none';
+  if(v) document.getElementById('f-price').focus();
+}
+
+function calcInstallments(){
+  var price=parseFloat(document.getElementById('f-price').value)||0;
+  if(price<1000){
+    document.getElementById('plan-wrap').style.display='none';
+    return;
+  }
+  document.getElementById('plan-wrap').style.display='block';
+  [3,6,9,12].forEach(function(m){
+    var pct=m===12?30:m===9?25:m===6?20:15;
+    var total=Math.round(price*(1+pct/100));
+    var monthly=Math.round(total/m);
+    var el=document.getElementById('monthly-'+m);
+    if(el) el.textContent='₨'+fmt(monthly)+'/ماہ';
+  });
+  // اگر پلان پہلے سے منتخب ہو تو update کریں
+  if(selectedPlan.months>0) selectPlan(selectedPlan.months,selectedPlan.pct);
+}
+
+function selectPlan(months,pct){
+  selectedPlan={months:months,pct:pct};
+  // سب cards reset
+  [3,6,9,12].forEach(function(m){
+    var c=document.getElementById('plan-'+m);
+    if(c){c.style.borderColor='#d1fae5';c.style.background='white';}
+  });
+  // منتخب card highlight
+  var sel=document.getElementById('plan-'+months);
+  if(sel){sel.style.borderColor='#15803d';sel.style.background='#f0fdf4';}
+
+  var price=parseFloat(document.getElementById('f-price').value)||0;
+  var total=Math.round(price*(1+pct/100));
+  var monthly=Math.round(total/months);
+
+  document.getElementById('sum-cost').textContent='₨'+fmt(price);
+  document.getElementById('sum-total').textContent='₨'+fmt(total);
+  document.getElementById('sum-monthly').textContent='₨'+fmt(monthly);
+  document.getElementById('plan-summary').style.display='block';
+  document.getElementById('err-plan').style.display='none';
+}
+
+// Firebase init
+try{
+  firebase.initializeApp({
+    apiKey:"AIzaSyCjNVkdUzt9QkuqlIyAKDBBI1lbNLIgNF4",
+    authDomain:"asatizafund.firebaseapp.com",
+    projectId:"asatizafund",
+    storageBucket:"asatizafund.firebasestorage.app",
+    messagingSenderId:"1030118405065",
+    appId:"1:1030118405065:web:66c0703223068f83a0ae18"
+  });
+  var db=firebase.firestore();
+  fbReady=true;
+  document.getElementById('fb-status').textContent='✅ تیار ہے';
+  document.getElementById('fb-status').style.color='#15803d';
+}catch(e){
+  document.getElementById('fb-status').textContent='⚠️ Firebase error: '+e.message;
+  document.getElementById('fb-status').style.color='#dc2626';
+}
+
+function handleSelfie(input){
+  var file=input.files[0];
+  if(!file)return;
+  // تصویر compress کریں
+  var img=new Image();
+  var reader=new FileReader();
+  reader.onload=function(e){
+    img.onload=function(){
+      var canvas=document.createElement('canvas');
+      var MAX=600;
+      var w=img.width,h=img.height;
+      if(w>h){if(w>MAX){h=h*(MAX/w);w=MAX;}}
+      else{if(h>MAX){w=w*(MAX/h);h=MAX;}}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      selfieBase64=canvas.toDataURL('image/jpeg',0.7);
+      var preview=document.getElementById('selfie-preview');
+      preview.src=selfieBase64;
+      preview.style.display='block';
+      document.getElementById('selfie-area').style.borderColor='#15803d';
+      document.getElementById('err-selfie').style.display='none';
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// CNIC format
+document.getElementById('f-cnic').addEventListener('input',function(){
+  var v=this.value.replace(/\D/g,'');
+  if(v.length>5)v=v.slice(0,5)+'-'+v.slice(5);
+  if(v.length>13)v=v.slice(0,13)+'-'+v.slice(13);
+  this.value=v.slice(0,15);
+});
+
+function showErr(id,errId,show){
+  document.getElementById(errId).style.display=show?'block':'none';
+}
+
+function submitForm(){
+  var ok=true;
+  var name=document.getElementById('f-name').value.trim();
+  var phone=document.getElementById('f-phone').value.trim().replace(/\s/g,'');
+  var cnic=document.getElementById('f-cnic').value.trim();
+  var address=document.getElementById('f-address').value.trim();
+  var refName=document.getElementById('f-ref-name').value.trim();
+  var refPhone=document.getElementById('f-ref-phone').value.trim().replace(/\s/g,'');
+  var product=document.getElementById('f-product').value;
+  var productOther=document.getElementById('f-product-other').value.trim();
+  var finalProduct=product==='دیگر'?productOther:product;
+  var price=parseFloat(document.getElementById('f-price').value)||0;
+
+  if(name.length<2){document.getElementById('err-name').style.display='block';ok=false;}else document.getElementById('err-name').style.display='none';
+  if(!/^03[0-9]{9}$/.test(phone)){document.getElementById('err-phone').style.display='block';ok=false;}else document.getElementById('err-phone').style.display='none';
+  if(!/^\d{5}-\d{7}-\d$/.test(cnic)){document.getElementById('err-cnic').style.display='block';ok=false;}else document.getElementById('err-cnic').style.display='none';
+  if(address.length<5){document.getElementById('err-address').style.display='block';ok=false;}else document.getElementById('err-address').style.display='none';
+  if(refName.length<2){document.getElementById('err-ref-name').style.display='block';ok=false;}else document.getElementById('err-ref-name').style.display='none';
+  if(!/^03[0-9]{9}$/.test(refPhone)){document.getElementById('err-ref-phone').style.display='block';ok=false;}else document.getElementById('err-ref-phone').style.display='none';
+  if(!product){document.getElementById('err-product').style.display='block';ok=false;}else document.getElementById('err-product').style.display='none';
+  if(!price||price<1000){document.getElementById('err-price').style.display='block';ok=false;}else document.getElementById('err-price').style.display='none';
+  if(!selectedPlan.months){document.getElementById('err-plan').style.display='block';ok=false;}else document.getElementById('err-plan').style.display='none';
+  if(!selfieBase64){document.getElementById('err-selfie').style.display='block';ok=false;}
+  if(!cnicFrontBase64){document.getElementById('err-cnic-front').style.display='block';ok=false;}
+  if(!cnicBackBase64){document.getElementById('err-cnic-back').style.display='block';ok=false;}
+  var t1=document.getElementById('term-1').checked;
+  var t2=document.getElementById('term-2').checked;
+  if(!t1||!t2){document.getElementById('err-terms').style.display='block';ok=false;}
+  else document.getElementById('err-terms').style.display='none';
+
+  if(!ok){document.querySelector('[style*="block"]').scrollIntoView({behavior:'smooth',block:'center'});return;}
+  if(!fbReady){alert('Firebase ابھی تیار نہیں — صفحہ refresh کریں');return;}
+
+  var total=Math.round(price*(1+selectedPlan.pct/100));
+  var monthly=Math.round(total/selectedPlan.months);
+
+  var btn=document.getElementById('submit-btn');
+  btn.disabled=true;
+  btn.textContent='⏳ جمع ہو رہا ہے...';
+
+  db.collection('customerRequests').add({
+    name:name,
+    phone:phone,
+    cnic:cnic,
+    address:address,
+    refName:refName,
+    refPhone:refPhone,
+    product:finalProduct,
+    productCost:price,
+    planMonths:selectedPlan.months,
+    planPct:selectedPlan.pct,
+    totalPrice:total,
+    monthlyPayment:monthly,
+    photoUrl:selfieBase64,
+    cnicFront:cnicFrontBase64,
+    cnicBack:cnicBackBase64,
+    termsAccepted:true,
+    submittedAtMs:Date.now()
+  }).then(function(){
+    document.getElementById('main-form').style.display='none';
+    document.getElementById('success-screen').style.display='block';
+    document.getElementById('fb-status').style.display='none';
+  }).catch(function(e){
+    btn.disabled=false;
+    btn.textContent='✔ درخواست جمع کریں';
+    alert('خرابی: '+e.message);
+  });
+}
+</script>
+</body>
+</html>
